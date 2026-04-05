@@ -34,11 +34,11 @@ const bots = {
 };
 
 function addLog(shopId, msg) {
-  const time = new Date().toISOString();
+  const time = new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Baku' });
   const logMsg = `[${time}] ${msg}`;
   console.log(`[${shopId}] ${logMsg}`);
-  bots[shopId].logs.unshift(logMsg);
-  if (bots[shopId].logs.length > 200) bots[shopId].logs.pop();
+  bots[shopId].logs.push(logMsg);
+  if (bots[shopId].logs.length > 1000) bots[shopId].logs.shift();
 }
 
 async function getAwaitingPostings(shopId) {

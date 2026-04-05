@@ -5,14 +5,28 @@ function ShopPanel({ shopId, title, status, logs, onToggle, onSaveConfig }) {
   const [showSettings, setShowSettings] = useState(false);
   const [configForm, setConfigForm] = useState({ clientId: '', apiKey: '', intervalSec: 30 });
   const logsEndRef = useRef(null);
+  const isConfigInitialized = useRef(false);
+  const [autoScroll, setAutoScroll] = useState(true);
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    setAutoScroll(scrollHeight - scrollTop - clientHeight < 50);
+  };
 
   useEffect(() => {
-    if (status?.config) {
+    if (autoScroll && logsEndRef.current) {
+      logsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [logs, autoScroll]);
+
+  useEffect(() => {
+    if (status?.config && !isConfigInitialized.current) {
       setConfigForm({
         clientId: status.config.clientId || '',
         apiKey: status.config.apiKey || '',
         intervalSec: status.config.intervalSec || 30
       });
+      isConfigInitialized.current = true;
     }
   }, [status?.config]);
 
@@ -116,7 +130,10 @@ function ShopPanel({ shopId, title, status, logs, onToggle, onSaveConfig }) {
             <span>Логи</span>
           </div>
         </div>
-        <div className="p-3 overflow-y-auto flex-1 font-mono text-xs space-y-1">
+        <div 
+          className="p-3 overflow-y-auto flex-1 font-mono text-xs space-y-1"
+          onScroll={handleScroll}
+        >
           {!logs || logs.length === 0 ? (
             <div className="text-gray-600 italic">Нет логов. Запустите бота.</div>
           ) : (
